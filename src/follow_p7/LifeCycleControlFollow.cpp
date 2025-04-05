@@ -184,19 +184,28 @@ bool
 LifeCycleControlFollow::check_detections()
 {
   std::string error;
-  if (tf_buffer_.canTransform("object_frame", "base_footprint", tf2::TimePointZero, &error)) {
-    auto object = tf_buffer_.lookupTransform(
-      "base_footprint", "object_frame", tf2::TimePointZero);
+  if (tf_buffer_.canTransform("camera_frame", "detected_obstacle", tf2::TimePointZero, &error) &&
+    tf_buffer_.canTransform("base_footprint", "camera_frame", tf2::TimePointZero, &error)) {
 
-    double x = object.transform.translation.x;
-    double y = object.transform.translation.y;
+    auto camera_2object = tf_buffer_.lookupTransform(
+      "camera_frame", "detected_obstacle", tf2::TimePointZero);
+    auto bf_2camera = tf_buffer_.lookupTransform(
+      "base_footprint", "camera_frame", tf2::TimePointZero);
+
+    tf2::fromMsg(camera_2object.transform, camera_2object_);
+    tf2::fromMsg(bf_2camera.transform, bf_2camera_);
+    auto bf_2object = bf_2camera_ * camera_2object_;
+
+    double x = bf_2object.getOrigin().x();
+    double y = bf_2object.getOrigin().y();
     velocity_.linear.x = select_vel(x, y);
     velocity_.angular.z = select_ang(x, y);
     publisher_velocity_->publish(velocity_);
     return true;
 
   } else {
-    RCLCPP_WARN_STREAM(get_logger(), "Error in TF base_footprint -> object [<< " << error << "]");
+    RCLCPP_WARN_STREAM(get_logger(),
+      "Error in TF camera_frame -> detected_obstacle or base_footprint -> camera_frame [<< " << error << "]");
     return false;
   }
 }
