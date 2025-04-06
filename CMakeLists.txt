@@ -31,6 +31,7 @@ include_directories(include)
 add_library(${PROJECT_NAME} SHARED
   src/follow_p7/LifeCycleControlFollow.cpp
   src/follow_p7/PIDController.cpp
+  src/follow_p7/TfCreatorNode.cpp
 )
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
@@ -38,9 +39,14 @@ add_executable(lifecycle_follow_class src/lifecycle_follow_class.cpp)
 ament_target_dependencies(lifecycle_follow_class ${dependencies})
 target_link_libraries(lifecycle_follow_class ${PROJECT_NAME})
 
+add_executable(tf_creator_class src/tf_creator_class.cpp)
+ament_target_dependencies(tf_creator_class ${dependencies})
+target_link_libraries(tf_creator_class ${PROJECT_NAME})
+
 install(TARGETS
   ${PROJECT_NAME}
   lifecycle_follow_class
+  tf_creator_class
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}

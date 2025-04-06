@@ -22,6 +22,8 @@
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 
+#include "vision_msgs/msg/detection3_d_array.hpp"
+
 #include "follow_p7/TfCreatorNode.hpp"
 
 using namespace std::chrono_literals;
@@ -33,10 +35,9 @@ namespace follow_p7
 TfCreatorNode::TfCreatorNode()
 : Node("tf_creator_node"),
   tf_buffer_(),
-  tf_listener_(tf_buffer_)
+  tf_listener_(tf_buffer_),
+  tf_broadcaster_(std::make_shared<tf2_ros::TransformBroadcaster>(this))
 {
-  tf_broadcaster_ = tf2_ros::TransformBroadcaster(this);
-
   this->declare_parameter("target", "ball");
   this->get_parameter("target", target_);
 
@@ -44,7 +45,7 @@ TfCreatorNode::TfCreatorNode()
     "detection_3d", 10, std::bind(&TfCreatorNode::camera_callback, this, _1));
 
   timer_ = create_wall_timer(
-    50ms, std::bind(&TfCreatorNode::control_cycle, this));
+    100ms, std::bind(&TfCreatorNode::control_cycle, this));
 }
 
 void
@@ -56,22 +57,24 @@ TfCreatorNode::control_cycle( )
   }
 
   for (auto & detection : detections_3d_msg_.detections) {
-    if (detection.results[0].id == target_) {
-      geometry_msgs::msg::TransformStamped object_tf;
-      object_tf.header.frame_id = "camera_frame";
-      object_tf.header.stamp = now();
-      object_tf.child_frame_id = "detected_obstacle";
-      object_tf.transform.translation.x = detection.bbox.center.position.x;
-      object_tf.transform.translation.y = detection.bbox.center.position.y;
-      object_tf.transform.translation.z = detection.bbox.center.position.z;
-      tf_broadcaster_.sendTransform(object_tf);
+    if (!detection.results.empty()) {
+      if (detection.results[0].hypothesis.class_id == target_) {
+        geometry_msgs::msg::TransformStamped object_tf;
+        object_tf.header.frame_id = "camera_link";
+        object_tf.header.stamp = now();
+        object_tf.child_frame_id = "detected_obstacle";
+        object_tf.transform.translation.x = detection.bbox.center.position.x;
+        object_tf.transform.translation.y = detection.bbox.center.position.y;
+        object_tf.transform.translation.z = detection.bbox.center.position.z;
+        tf_broadcaster_->sendTransform(object_tf);
 
-      RCLCPP_INFO(get_logger(), 
-                  "Published object_2camera: %f, %f, %f", 
-                  object_tf.transform.translation.x, 
-                  object_tf.transform.translation.y, 
-                  object_tf.transform.translation.z);
-      break;
+        RCLCPP_INFO(get_logger(), 
+                    "Published object_2camera: x=%f, y=%f, z=%f", 
+                    object_tf.transform.translation.x, 
+                    object_tf.transform.translation.y, 
+                    object_tf.transform.translation.z);
+        break;
+      }
     }
   }
 }
@@ -83,6 +86,7 @@ TfCreatorNode::camera_callback(const vision_msgs::msg::Detection3DArray::SharedP
     RCLCPP_INFO(get_logger(), "No camera detections received.");
     return;
   }
+  RCLCPP_INFO(get_logger(), "Detección recibida");
   detections_3d_msg_ = *msg;
   last_detection_time_ = this->now();
 }

@@ -41,12 +41,17 @@ def generate_launch_description():
             output='screen',
             remappings=[
                 ('input_detection_2d', 'detection_2d'),
-                ('input_pointcloud', '/depth/points'), # camera_points_topic
+                ('input_pointcloud', '/depth/points'),  # camera_points_topic
                 ('output_detection_3d', 'detection_3d'),
             ]
         )
 
-    # creator_tf
+    creator_tf = Node(
+            package='follow_p7',
+            executable='tf_creator_class',
+            name='tf_creator_node',
+            output='screen',
+    )
 
     control_follow = Node(
             package='follow_p7',
@@ -58,6 +63,7 @@ def generate_launch_description():
     ld = LaunchDescription()
     ld.add_action(yolo_2d)
     ld.add_action(pc_3d)
+    ld.add_action(creator_tf)
     ld.add_action(control_follow)
 
     return ld

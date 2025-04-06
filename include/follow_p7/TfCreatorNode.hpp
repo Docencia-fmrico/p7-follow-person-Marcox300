@@ -20,6 +20,7 @@
 #include "tf2_ros/transform_broadcaster.h"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 
+#include "vision_msgs/msg/detection3_d_array.hpp"
 
 namespace follow_p7
 {
@@ -41,7 +42,7 @@ private:
 
   tf2::BufferCore tf_buffer_;
   tf2_ros::TransformListener tf_listener_;
-  tf2_ros::TransformBroadcaster tf_broadcaster_;
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
   std::string target_;
 };
