@@ -13,5 +13,14 @@ Implementa una aplicación ROS 2 que siga a una persona a un metro:
 3. Haz que cuando no vea a una persona, la busque.
 4. Una vez encontrada, usa un PID para aproximarse a la TF que haya producido la detección de la persona.
 
+# Implementación de objetivos 
 
-   
+1. Código externo
+
+Por parte del [ASR_2025](https://github.com/Docencia-fmrico/ASR_2025) utilizo los programas de *camera* lanzandolos desde mi launcher. Tambien se tiene que lanzar [Yolo](https://github.com/mgonzs13/yolo_ros) que se encuentra tambien en ARS,
+esta parte no a sido comprobada actualmente.
+
+2. Implementación propia
+
+El nodo que transforma detecciones 3d a tf crea una tf de cámara a objetivo y la publica. En el segundo nodo LifeCycle cuando se activa recoge las tf camera2obstacle (obstacle no es un buen nombre tiene que cambiarse) y bf2camera. Tras recoger las transformadas
+obtenemos bf2obstacle = bf2camera * camera2obstacle. de aqui sacamos la x e y del robot.
