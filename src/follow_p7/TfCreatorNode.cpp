@@ -60,7 +60,7 @@ TfCreatorNode::control_cycle( )
     if (!detection.results.empty()) {
       if (detection.results[0].hypothesis.class_id == target_) {
         geometry_msgs::msg::TransformStamped object_tf;
-        object_tf.header.frame_id = "camera_link";
+        object_tf.header.frame_id = "camera_rgb_optical_frame";
         object_tf.header.stamp = now();
         object_tf.child_frame_id = "detected_obstacle";
         object_tf.transform.translation.x = detection.bbox.center.position.x;
@@ -69,7 +69,7 @@ TfCreatorNode::control_cycle( )
         tf_broadcaster_->sendTransform(object_tf);
 
         RCLCPP_INFO(get_logger(), 
-                    "Published object_2camera: x=%f, y=%f, z=%f", 
+                    "Published camera_2object: x=%f, y=%f, z=%f", 
                     object_tf.transform.translation.x, 
                     object_tf.transform.translation.y, 
                     object_tf.transform.translation.z);

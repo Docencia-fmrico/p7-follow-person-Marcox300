@@ -184,13 +184,13 @@ bool
 LifeCycleControlFollow::check_detections()
 {
   std::string error;
-  if (tf_buffer_.canTransform("camera_link", "detected_obstacle", tf2::TimePointZero, &error) &&
-    tf_buffer_.canTransform("base_footprint", "camera_link", tf2::TimePointZero, &error)) {
+  if (tf_buffer_.canTransform("camera_rgb_optical_frame", "detected_obstacle", tf2::TimePointZero, &error) &&
+    tf_buffer_.canTransform("base_footprint", "camera_rgb_optical_frame", tf2::TimePointZero, &error)) {
 
     auto camera_2object = tf_buffer_.lookupTransform(
-      "camera_link", "detected_obstacle", tf2::TimePointZero);
+      "camera_rgb_optical_frame", "detected_obstacle", tf2::TimePointZero);
     auto bf_2camera = tf_buffer_.lookupTransform(
-      "base_footprint", "camera_link", tf2::TimePointZero);
+      "base_footprint", "camera_rgb_optical_frame", tf2::TimePointZero);
 
     tf2::fromMsg(camera_2object.transform, camera_2object_);
     tf2::fromMsg(bf_2camera.transform, bf_2camera_);
