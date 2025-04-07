@@ -23,13 +23,19 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    # yolo detector
+    pkg_dir = get_package_share_directory('camera')
+    param_file = os.path.join(pkg_dir, 'config', 'params.yaml')
+
+    # yolo_launcher
+
     yolo_2d = Node(
             package='camera',
             executable='yolo_detection',
             name='darkent_detection_node',
             output='screen',
+            parameters=[param_file],
             remappings=[
+                ('input_detection', '/yolo/detections'),
                 ('output_detection_2d', 'detection_2d'),
             ]
         )
