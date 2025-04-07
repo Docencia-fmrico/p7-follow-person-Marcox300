@@ -40,7 +40,7 @@ def generate_launch_description():
             ]
         )
 
-    pc_3d = Node(
+    convert_2d_3d = Node(
             package='camera',
             executable='detection_2d_to_3d_pc2',
             name='detection_to_3d_from_pc2_node',
@@ -49,6 +49,7 @@ def generate_launch_description():
                 ('input_detection_2d', 'detection_2d'),
                 ('input_pointcloud', '/depth/points'),  # camera_points_topic
                 ('output_detection_3d', 'detection_3d'),
+                ('camera_info', '/color/camera_info'),  # camerainfo_topic
             ]
         )
 
@@ -68,7 +69,7 @@ def generate_launch_description():
 
     ld = LaunchDescription()
     ld.add_action(yolo_2d)
-    ld.add_action(pc_3d)
+    ld.add_action(convert_2d_3d)
     ld.add_action(creator_tf)
     ld.add_action(control_follow)
 

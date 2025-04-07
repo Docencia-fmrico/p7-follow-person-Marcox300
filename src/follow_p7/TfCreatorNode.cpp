@@ -38,7 +38,7 @@ TfCreatorNode::TfCreatorNode()
   tf_listener_(tf_buffer_),
   tf_broadcaster_(std::make_shared<tf2_ros::TransformBroadcaster>(this))
 {
-  this->declare_parameter("target", "ball");
+  this->declare_parameter("target", "sports ball");
   this->get_parameter("target", target_);
 
   subscriber_attractive_vector_ = create_subscription<vision_msgs::msg::Detection3DArray>(
