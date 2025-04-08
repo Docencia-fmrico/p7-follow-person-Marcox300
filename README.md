@@ -24,3 +24,10 @@ esta parte no a sido comprobada actualmente.
 
 El nodo que transforma detecciones 3d a tf crea una tf de cámara a objetivo y la publica. En el segundo nodo LifeCycle cuando se activa recoge las tf camera2target y bf2camera. Tras recoger las transformadas
 obtenemos bf2target = bf2camera * camera2target. de aqui sacamos la x e y del robot.
+
+# Video
+
+
+
+https://github.com/user-attachments/assets/7fcc417d-ccc8-4231-9cd4-5aaada3d5439
+
