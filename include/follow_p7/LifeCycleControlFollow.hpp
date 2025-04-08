@@ -63,7 +63,7 @@ private:
   tf2::BufferCore tf_buffer_;
   tf2_ros::TransformListener tf_listener_;
   tf2::Transform bf_2camera_;
-  tf2::Transform camera_2object_;
+  tf2::Transform camera_2target_;
 
   PIDController vlin_pid_, vrot_pid_;
 };

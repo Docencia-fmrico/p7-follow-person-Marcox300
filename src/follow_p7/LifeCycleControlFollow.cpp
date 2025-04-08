@@ -130,7 +130,7 @@ LifeCycleControlFollow::timer_callback()
 {
   switch (state_) {
     case NOT_DETECT:
-      RCLCPP_INFO(get_logger(), "Waitting to object");
+      RCLCPP_INFO(get_logger(), "Waitting to target");
       velocity_.angular.z = 0.2;
       publisher_velocity_->publish(velocity_);
 
@@ -142,7 +142,7 @@ LifeCycleControlFollow::timer_callback()
       }
       break;
     case MOVE:
-      RCLCPP_INFO(get_logger(), "Moving to object");
+      RCLCPP_INFO(get_logger(), "Moving to target");
 
       if (!check_detections()) {
         velocity_.linear.x = 0;
@@ -184,20 +184,20 @@ bool
 LifeCycleControlFollow::check_detections()
 {
   std::string error;
-  if (tf_buffer_.canTransform("camera_rgb_optical_frame", "detected_obstacle", tf2::TimePointZero, &error) &&
+  if (tf_buffer_.canTransform("camera_rgb_optical_frame", "detected_target", tf2::TimePointZero, &error) &&
     tf_buffer_.canTransform("base_footprint", "camera_rgb_optical_frame", tf2::TimePointZero, &error)) {
 
-    auto camera_2object = tf_buffer_.lookupTransform(
-      "camera_rgb_optical_frame", "detected_obstacle", tf2::TimePointZero);
+    auto camera_2target = tf_buffer_.lookupTransform(
+      "camera_rgb_optical_frame", "detected_target", tf2::TimePointZero);
     auto bf_2camera = tf_buffer_.lookupTransform(
       "base_footprint", "camera_rgb_optical_frame", tf2::TimePointZero);
 
-    tf2::fromMsg(camera_2object.transform, camera_2object_);
+    tf2::fromMsg(camera_2target.transform, camera_2target_);
     tf2::fromMsg(bf_2camera.transform, bf_2camera_);
-    auto bf_2object = bf_2camera_ * camera_2object_;
+    auto bf_2target = bf_2camera_ * camera_2target_;
 
-    double x = bf_2object.getOrigin().x();
-    double y = bf_2object.getOrigin().y();
+    double x = bf_2target.getOrigin().x();
+    double y = bf_2target.getOrigin().y();
     RCLCPP_INFO(get_logger(), "Position xy {%f, %f}", x, y);
     velocity_.linear.x = select_vel(x, y);
     velocity_.angular.z = select_ang(x, y);

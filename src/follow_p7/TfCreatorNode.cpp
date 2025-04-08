@@ -38,8 +38,9 @@ TfCreatorNode::TfCreatorNode()
   tf_listener_(tf_buffer_),
   tf_broadcaster_(std::make_shared<tf2_ros::TransformBroadcaster>(this))
 {
-  this->declare_parameter("target", "sports ball");
+  this->declare_parameter("target", "person");
   this->get_parameter("target", target_);
+  RCLCPP_INFO(get_logger(),"Te target is: %s", target_.c_str());
 
   subscriber_attractive_vector_ = create_subscription<vision_msgs::msg::Detection3DArray>(
     "detection_3d", 10, std::bind(&TfCreatorNode::camera_callback, this, _1));
@@ -62,7 +63,7 @@ TfCreatorNode::control_cycle( )
         geometry_msgs::msg::TransformStamped object_tf;
         object_tf.header.frame_id = "camera_rgb_optical_frame";
         object_tf.header.stamp = now();
-        object_tf.child_frame_id = "detected_obstacle";
+        object_tf.child_frame_id = "detected_target";
         object_tf.transform.translation.x = detection.bbox.center.position.x;
         object_tf.transform.translation.y = detection.bbox.center.position.y;
         object_tf.transform.translation.z = detection.bbox.center.position.z;

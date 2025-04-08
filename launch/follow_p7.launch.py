@@ -16,9 +16,8 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
@@ -26,7 +25,7 @@ def generate_launch_description():
     pkg_dir = get_package_share_directory('camera')
     param_file = os.path.join(pkg_dir, 'config', 'params.yaml')
 
-    # yolo_launcher
+    declare_target_param = DeclareLaunchArgument('target', default_value='person', description='El objetivo para el parámetro target')
 
     yolo_2d = Node(
             package='camera',
@@ -58,6 +57,9 @@ def generate_launch_description():
             executable='tf_creator_class',
             name='tf_creator_node',
             output='screen',
+            parameters=[
+                {'target': LaunchConfiguration('target')}
+            ],
     )
 
     control_follow = Node(
@@ -68,6 +70,7 @@ def generate_launch_description():
         )
 
     ld = LaunchDescription()
+    ld.add_action(declare_target_param)
     ld.add_action(yolo_2d)
     ld.add_action(convert_2d_3d)
     ld.add_action(creator_tf)
